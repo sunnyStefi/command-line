@@ -7,13 +7,13 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     // dbg!(args);
 
-    let minigrepArgs = MinigrepArgs::build(&args).unwrap_or_else(|err| {
-        println!("{err}");
+    let minigrep_args = MinigrepArgs::build(&args).unwrap_or_else(|_err| {
+        println!("{_err}");
         process::exit(1);
     });
 
-    if let Err(err) = minigrep::run(minigrepArgs){
-        println!("{err}");
+    if let Err(_err) = minigrep::run(minigrep_args){
+        println!("{_err}");
         process::exit(1);
     };
     
