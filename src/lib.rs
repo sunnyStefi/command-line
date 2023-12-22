@@ -9,13 +9,19 @@ pub struct MinigrepArgs {
 }
 
 impl MinigrepArgs {
-    pub fn build(args: &[String]) -> Result<MinigrepArgs, &'static str> {
-        if args.len() < 3 {
-            return Err("Not enough arguments");
-        }
+    pub fn build(mut args: impl Iterator<Item = String>) -> Result<MinigrepArgs, &'static str> {
+        args.next(); //name of the program
 
-        let query = args[1].clone();
-        let file_path = args[2].clone();
+        let query = match args.next() {
+            Some(arg) => arg,
+            None => return Err("no query string")
+        };
+
+        let file_path = match args.next() {
+            Some(arg) => arg,
+            None => return Err("no file path")
+        };
+        
 
         let ignore_case = env::var("IGNORE_CASE").is_ok();
         Ok(MinigrepArgs { query, file_path, ignore_case })
@@ -49,14 +55,8 @@ pub fn search_case_sensitive<'a>(text_to_search: &str, contents: &'a str) -> Vec
 }
 
 pub fn search_case_insensitive<'a>(text_to_search: &str, contents: &'a str) -> Vec<&'a str> {
-    let mut filtered_contents = Vec::new();
     let lowercase_query = text_to_search.to_lowercase(); //String
-    for line in contents.lines(){
-        if line.to_lowercase().contains(&lowercase_query){
-            filtered_contents.push(line);
-        }
-    }
-    filtered_contents
+    contents.lines().filter(|line| line.contains(&lowercase_query)).collect()
 }
 
 //test driven development TDD!
